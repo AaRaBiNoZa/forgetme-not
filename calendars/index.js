@@ -1,6 +1,6 @@
 import express, { json } from 'express';
 import cors from 'cors';
-import apiRouter from './api/reminders.js';
+import apiRouter from './api/calendars.js';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
