@@ -14,3 +14,8 @@ We used varnish as a loadbalancer and redis for a fast cache. Everything is set 
 To run locally simply move to the main directory and run
 `docker compose up -d`
 After a while, the site should be running on `http://localhost:3000`.
+
+## Screenshots
+![image](./screenshots/login.png)
+![image](./screenshots/calendars.png)
+![image](./screenshots/reminders.png)
