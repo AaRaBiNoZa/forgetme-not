@@ -1,0 +1,83 @@
+version: "3.8"
+
+services:
+  front1:
+    image: front
+    build: ./front
+    container_name: front1
+
+  front2:
+    image: front
+    build: ./front
+    container_name: front2
+
+  reminders:
+    image: reminders
+    build: ./reminders
+    container_name: reminders
+    ports:
+      - ${REMINDERS_PORT}:8080
+    depends_on:
+      - redis
+    env_file: 
+      - .env
+    volumes:
+      - remindersdata:/data
+
+  users:
+    image: users
+    build: ./users
+    container_name: users
+    ports:
+      - ${USERS_PORT}:8080
+    environment:
+      CONFIG_MONGO_ADMINUSERNAME: "${MONGO_USERNAME}"
+      CONFIG_MONGO_ADMINPASSWORD: "${MONGO_PASSWORD}"
+      CONFIG_MONGO_URL: "mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017/forgetmenot_db"
+
+  calendars:
+    image: calendars
+    build: ./calendars
+    container_name: calendars
+    ports:
+      - ${CALENDARS_PORT}:8080
+    env_file: 
+      - .env
+    volumes:
+      - calendarsdata:/data
+
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "${MONGO_USERNAME}"
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_PASSWORD}"
+      MONGO_INITDB_DATABASE: "forgetmenot_db"
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+
+  redis:
+    image: redis
+    container_name: redis
+    expose:
+      - 6379
+    ports:
+      - 6379:6379
+
+  varnish-front:
+    image: varnish:7.0
+    container_name: varnish
+    volumes:
+      - ./varnish:/etc/varnish:ro
+    ports:
+      - 3000:80
+    depends_on:
+      - front1
+      - front2
+
+volumes:
+  calendarsdata:
+  remindersdata:
+
